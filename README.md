@@ -2,7 +2,7 @@
 
 This page describes how to define an HTTPS client and server flow in Mule 3.7. I explain both how to configure one-way SSL as well as mutual authentication by giving both client and server example flows in Mule.
 
-Note, all key stores and trust stores in this example have been generated using keystore explorer which is a very handy graphical alternative to the java keytool. All stores were created using the RSA algorithm.
+Note, all key stores and trust stores in this example have been generated using [keystore explorer](http://www.ricston.com/blog/configuring-https-mule/) which is a very handy graphical alternative to the java keytool. All stores were created using the RSA algorithm.
 
 The following is an HTTP listener used to accept messages in a client flow:
 
