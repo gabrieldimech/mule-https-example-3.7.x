@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:https="http://www.mulesoft.org/schema/mule/https"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.7.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+
+	<http:listener-config name="httpsServerConnector"
+		host="localhost" port="8083" doc:name="HTTP Listener Configuration"
+		protocol="HTTPS">
+		<tls:context>
+			<tls:key-store type="jks" path="server-keystore"
+				keyPassword="mulepass" password="mulepass" />
+		</tls:context>
+	</http:listener-config>
+
+	<http:listener-config name="httpServerConnector"
+		host="localhost" port="8081" doc:name="HTTP Listener Configuration" />
+
+	<http:request-config protocol="HTTPS"
+		name="httpsClientConnector" host="localhost" port="8083"
+		doc:name="HTTP Request Configuration">
+		<tls:context>
+			<tls:trust-store path="client-truststore" password="mulepass"
+				type="jks" />
+		</tls:context>
+	</http:request-config>
+
+	<flow name="httpsClient">
+		<http:listener path="httpServer" config-ref="httpServerConnector"
+			doc:name="HTTP" />
+		<logger message="sending request from https client to https server..."
+			level="INFO" doc:name="Logger" />
+		<http:request config-ref="httpsClientConnector" path="httpsServer"
+			method="GET" doc:name="HTTP" />
+	</flow>
+
+	<flow name="httpsServer">
+		<http:listener path="httpsServer" config-ref="httpsServerConnector"
+			doc:name="HTTP" />
+		<logger message="accessed https server successfully!" level="INFO"
+			doc:name="Logger" />
+	</flow>
+
+</mule>
