@@ -14,6 +14,9 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
 	<http:listener-config name="httpServerConnector"
 		host="localhost" port="8081" doc:name="HTTP Listener Configuration" />
 	
+	
+	
+	
 	<http:listener-config name="httpsServerConnectorOneWaySSL"
 		host="localhost" port="8082" doc:name="HTTP Listener Configuration"
 		protocol="HTTPS">
@@ -33,6 +36,11 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
 				keyPassword="mulepass" password="mulepass" />
 		</tls:context>
 	</http:listener-config>
+	
+	
+	
+	
+	
 
 	<http:request-config protocol="HTTPS"
 		name="httpsClientConnectorMutualAuth" host="localhost" port="8083"
@@ -51,8 +59,6 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
 		<tls:context>
 			<tls:trust-store path="client-truststore" password="mulepass"
 				type="jks" />
-			<tls:key-store type="jks" path="client-keystore"
-				keyPassword="mulepass" password="mulepass" />
 		</tls:context>
 	</http:request-config>
 
