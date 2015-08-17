@@ -11,8 +11,11 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
 
-	<http:listener-config name="httpsServerConnector"
-		host="localhost" port="8083" doc:name="HTTP Listener Configuration"
+	<http:listener-config name="httpServerConnector"
+		host="localhost" port="8081" doc:name="HTTP Listener Configuration" />
+	
+	<http:listener-config name="httpsServerConnectorOneWaySSL"
+		host="localhost" port="8082" doc:name="HTTP Listener Configuration"
 		protocol="HTTPS">
 		<tls:context>
 			<tls:key-store type="jks" path="server-keystore"
@@ -20,31 +23,68 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
 		</tls:context>
 	</http:listener-config>
 
-	<http:listener-config name="httpServerConnector"
-		host="localhost" port="8081" doc:name="HTTP Listener Configuration" />
+	<http:listener-config name="httpsServerConnectorMutualAuth"
+		host="localhost" port="8083" doc:name="HTTP Listener Configuration"
+		protocol="HTTPS">
+		<tls:context>
+			<tls:trust-store type="jks" path="server-truststore"
+				password="mulepass" />
+			<tls:key-store type="jks" path="server-keystore"
+				keyPassword="mulepass" password="mulepass" />
+		</tls:context>
+	</http:listener-config>
 
 	<http:request-config protocol="HTTPS"
-		name="httpsClientConnector" host="localhost" port="8083"
+		name="httpsClientConnectorMutualAuth" host="localhost" port="8083"
 		doc:name="HTTP Request Configuration">
 		<tls:context>
 			<tls:trust-store path="client-truststore" password="mulepass"
 				type="jks" />
+			<tls:key-store type="jks" path="client-keystore"
+				keyPassword="mulepass" password="mulepass" />
+		</tls:context>
+	</http:request-config>
+	
+	<http:request-config protocol="HTTPS"
+		name="httpsClientConnectorOneWaySSL" host="localhost" port="8082"
+		doc:name="HTTP Request Configuration">
+		<tls:context>
+			<tls:trust-store path="client-truststore" password="mulepass"
+				type="jks" />
+			<tls:key-store type="jks" path="client-keystore"
+				keyPassword="mulepass" password="mulepass" />
 		</tls:context>
 	</http:request-config>
 
-	<flow name="httpsClient">
-		<http:listener path="httpServer" config-ref="httpServerConnector"
+	<flow name="httpsClientMutualAuth">
+		<http:listener path="mutualAuth" config-ref="httpServerConnector"
 			doc:name="HTTP" />
-		<logger message="sending request from https client to https server..."
+		<logger message="sending request from https client to https server (mutual auth)..."
 			level="INFO" doc:name="Logger" />
-		<http:request config-ref="httpsClientConnector" path="httpsServer"
-			method="GET" doc:name="HTTP" />
+		<http:request config-ref="httpsClientConnectorMutualAuth"
+			path="httpsServer" method="GET" doc:name="HTTP" />
 	</flow>
 
-	<flow name="httpsServer">
-		<http:listener path="httpsServer" config-ref="httpsServerConnector"
+	<flow name="httpsServerMutualAuth">
+		<http:listener path="httpsServer" config-ref="httpsServerConnectorMutualAuth"
 			doc:name="HTTP" />
-		<logger message="accessed https server successfully!" level="INFO"
+		<logger message="accessed https server successfully - via mutual authentication!" level="INFO"
+			doc:name="Logger" />
+	</flow>
+	
+	<flow name="httpsClientOneWaySSL">
+		<http:listener path="oneWaySSL" config-ref="httpServerConnector"
+			doc:name="HTTP" />
+		<logger message="sending request from https client to https server (one way ssl)..."
+			level="INFO" doc:name="Logger" />
+		<http:request config-ref="httpsClientConnectorOneWaySSL"
+			path="httpsServer" method="GET" doc:name="HTTP" />
+	</flow>
+
+	<flow name="httpsServerOneWaySSL">
+		<http:listener path="httpsServer" config-ref="httpsServerConnectorOneWaySSL"
+			doc:name="HTTP" />
+		<logger message="accessed https server successfully - via one way ssl!" level="INFO"
 			doc:name="Logger" />
 	</flow>
 
